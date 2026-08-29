@@ -1,0 +1,15 @@
+WHITESPACE   =  _{ " " }
+
+number     = { ASCII_DIGIT+ }
+name       = { ASCII_ALPHA_LOWER+ }
+op_add     = { "+" }
+op_sub     = { "-" }
+op_mul     = { "*" }
+op_div     = { "/" }
+unary      = { op_sub ~ factor }
+atom       = { name | number }
+factor     = { atom | "(" ~ expression ~ ")" | unary }
+term       = { factor ~ ( ( op_mul | op_div ) ~ factor )* }
+expression = { term ~ ( ( op_add | op_sub ) ~ term )* }
+assignment = { name ~ "<-" ~ expression }
+file       = { (assignment ~ ( "\n" ~ assignment )* ~ "\n" )?  ~ expression }
