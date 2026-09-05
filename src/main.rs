@@ -35,7 +35,7 @@ fn eval_file(path: String) {
 
     // evalulate and print result
     let res = eval(pairs);
-    println!("result: {res}'");
+    println!("\nresult: {res}");
 }
 
 fn main() {

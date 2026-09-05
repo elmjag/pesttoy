@@ -62,18 +62,21 @@ fn eval_term(term: Pair<'_, Rule>, symbols: &SymTable) -> i64 {
 
     let mut parts = term.into_inner();
 
-    let left = eval_factor(parts.next().unwrap(), symbols);
+    // evaluate most left factor
+    let mut result = eval_factor(parts.next().unwrap(), symbols);
 
-    if let Some(op) = parts.next() {
-        let right = eval_factor(parts.next().unwrap(), symbols);
-        match op.as_rule() {
-            Rule::op_mul => left * right,
-            Rule::op_div => left / right,
+    while !parts.is_empty() {
+        let op = parts.next().unwrap();
+        let term = eval_factor(parts.next().unwrap(), symbols);
+
+        result = match op.as_rule() {
+            Rule::op_mul => result * term,
+            Rule::op_div => result / term,
             _ => panic!("unexpected rule '{:?}'", op.as_rule()),
-        }
-    } else {
-        left
+        };
     }
+
+    result
 }
 
 fn eval_expression(expression: Pair<'_, Rule>, symbols: &SymTable) -> i64 {
@@ -81,18 +84,21 @@ fn eval_expression(expression: Pair<'_, Rule>, symbols: &SymTable) -> i64 {
 
     let mut parts = expression.into_inner();
 
-    let left = eval_term(parts.next().unwrap(), symbols);
+    // evaluate most left term
+    let mut result = eval_term(parts.next().unwrap(), symbols);
 
-    if let Some(op) = parts.next() {
-        let right = eval_term(parts.next().unwrap(), symbols);
-        match op.as_rule() {
-            Rule::op_add => left + right,
-            Rule::op_sub => left - right,
+    while !parts.is_empty() {
+        let op = parts.next().unwrap();
+        let term = eval_term(parts.next().unwrap(), symbols);
+
+        result = match op.as_rule() {
+            Rule::op_add => result + term,
+            Rule::op_sub => result - term,
             _ => panic!("unexpected rule '{:?}'", op.as_rule()),
-        }
-    } else {
-        left
+        };
     }
+
+    result
 }
 
 fn eval_assignment(assignment: Pair<'_, Rule>, symbols: &mut SymTable) {
